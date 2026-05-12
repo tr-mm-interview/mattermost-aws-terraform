@@ -1,0 +1,20 @@
+#cloud-config
+# Intentionally minimal first-boot bootstrap.
+# Ansible owns application configuration, compose files, Nginx config and secrets.
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+packages:
+  - python3
+  - python3-apt
+  - nfs-common
+
+runcmd:
+  - [ mkdir, -p, /opt/mattermost ]
+  - [ chown, root:root, /opt/mattermost ]
+  - [ chmod, "0755", /opt/mattermost ]
+  - [ mkdir, -p, "${efs_mount_path}" ]
+  - [ sh, -lc, "grep -q ' ${efs_mount_path} ' /etc/fstab || echo '${efs_dns_name}:/ ${efs_mount_path} nfs4 defaults,_netdev,noresvport 0 0' >> /etc/fstab" ]
+  - [ mount, "${efs_mount_path}" ]
+  - [ sh, -lc, "systemctl list-unit-files snap.amazon-ssm-agent.amazon-ssm-agent.service >/dev/null 2>&1 && systemctl enable --now snap.amazon-ssm-agent.amazon-ssm-agent.service || true" ]

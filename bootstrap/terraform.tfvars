@@ -1,0 +1,5 @@
+project           = "mattermost"
+owner             = "tom"
+aws_region        = "eu-west-2"
+aws_profile       = "Tom"
+state_bucket_name = "mm-interview"
